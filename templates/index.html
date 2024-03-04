@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Translator</title>
+    <link href="{{ url_for('static', filename='css/styles.css') }}?v={{ current_time }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/functionality.css') }}?v={{ current_time }}" rel="stylesheet">
+</head>
+<body>
+    <div class="div">
+        <div class="div-2">
+          <div class="div-3">
+            <div class="div-4">
+              <div class="div-5">
+                <div class="column">
+                  <div class="div-6">
+                    <div class="div-7">
+                      <div class="dropdown-container">
+                        <div class="div-8">Please select a source language</div>
+                        <div class="source-lang-dropdown-content" style="display: none;">
+                          <a href="#" value="eng">English</a>
+                          <a href="#" value="zh">Chinese</a>
+                          <a href="#" value="ru">Russian</a>
+                          <a href="#" value="esp">Spanish</a>
+                          <a href="#" value="fr">French</a>
+                        </div>
+                      </div>
+
+                      <img
+                        loading="lazy"
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/188a4aa95b0468f5bd47c393764ca7bb867b48adde2e6f527f72a0cfb3c7bd6e?"
+                        class="img"
+                      />
+                    </div>
+                    <div class="div-9">     
+                      <div class="div-10">
+                        <div class="div-11">Preferences</div>
+                        <div class="div-12">Select to filter your results.</div>
+                      </div>
+                      <div class="div-13">File Upload</div>
+                      <div class="div-14">
+                        <div class="div-15">
+                           
+                            <input type="file" id="fileInput" accept=".docx, .pdf, .txt, .md">
+                            <img
+                                id="uploadStatus"
+                                loading="lazy"
+                                src="https://cdn.builder.io/api/v1/image/assets/TEMP/e4b7a00b295a3ebef16bb2cf508a93d06105e1a8f6caa64755acbed2da80bb50?"
+                                class="img"
+                                style="display: none;"
+                            />
+                            <!-- <div id="uploadStatus" class="div-16" style="display: none;"></div> -->
+                            
+                        </div>
+                        <div class="div-9">     
+                            <div class="div-10">
+                                <div class="div-11">Preferred</div>
+                                <div class="div-12">Select Your Preffered File Output</div>
+                                <div class="div-17">File Type</div>
+                                <form class="file-type-form">
+                                    <div class="div-18">
+                                        <input type="radio" id="fileTypeDocx" name="fileType" value="docx">
+                                        <label for="fileTypeDocx" class="div-20">Docx</label>
+                                    </div>
+                                    <!-- https://cdn.builder.io/api/v1/image/assets/TEMP/636067032300a41a12a93dd19300a95794767053d87ad1769df8ecbb662f9fda? -->
+                                    <div class="div-18">
+                                        <input type="radio" id="fileTypePdf" name="fileType" value="pdf">
+                                        <label for="fileTypePdf" class="div-20">PDF</label>
+                                    </div>
+                                    <div class="div-18">
+                                        <input type="radio" id="fileTypeTxt" name="fileType" value="txt">
+                                        <label for="fileTypeTxt" class="div-20">TXT</label>
+
+                                    </div>
+                                    <div class="div-18">
+                                        <input type="radio" id="fileTypeTxt" name="fileType" value="txt">
+                                        <label for="fileTypeTxt" class="div-20">MD</label>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+
+                        <div class="div-30">Select File Type</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column-2">
+                  <div class="div-31">
+
+                    <!-- <svg width="88" height="80" viewBox="0 0 88 80" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> -->
+
+                    <!-- </svg> -->
+                    <img loading="lazy" src="https://svgshare.com/i/10Vd.svg" class="img-3"/>
+                    
+                    <div class="div-32">
+                        
+
+                      <div class="div-33">Prompt</div>
+                      <div class="div-34">
+                        <textarea id="textInput"></textarea>
+                      </div>
+                    
+                      <div class="div-35">
+                        <p> Type your prompt specifications above or Default translate from source → target lang</p>
+                      </div>
+                    </div>
+                    <div class="div-36">Please select a target language</div>
+                    <div class="dropdown-container">
+                        <div class="target-lang-dropdown-content" style="display: none;">
+                          <a href="#" value="eng">English</a>
+                          <a href="#" value="zh">Chinese</a>
+                          <a href="#" value="ru">Russian</a>
+                          <a href="#" value="esp">Spanish</a>
+                          <a href="#" value="fr">French</a>
+                        </div>
+
+                    </div>
+                  
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span></span>
+          <div class="div-37" id="translateButton">
+            Submit
+          </div>
+
+          <div id="body-acc-container" style="display: none">
+            <img
+            loading="lazy"
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/316d6606c199728b1e334c3c3eaa5911c66477e55b4d9d0b94b8cd9a6fd7e0f7?"
+            id="body-acc">
+            <div id="text-container">The download link will appear after successful translation.
+              <div id="progressBarContainer">
+                <label for="fileProgress">Translation Progress:</label>
+                <progress id="fileProgress" value="0" max="100"></progress>
+                <span id="progressText">0%</span>
+              </div>
+              <div id="uploadStatus"></div>
+              <div id="downloadLink" style="display: none;">
+                <a href="#" download>Download Translated File</a>
+              </div>
+            </div>
+          </div>
+    </div>
+
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<script>
+    const socket = io();
+    socket.on('progress_update', function(data) {
+        updateProgressBar(data.progress);
+    });
+    let selectedFileType = null;
+    let isFileSelected = false;
+
+    document.querySelector('.div-8').addEventListener('click', function() {
+        var dropdown = document.querySelector('.source-lang-dropdown-content');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.querySelector('.div-36').addEventListener('click', function() {
+        var dropdown = document.querySelector('.target-lang-dropdown-content');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    });
+
+    var sourcelanguageLinks = document.querySelectorAll('.source-lang-dropdown-content a');
+    var targetlanguageLinks = document.querySelectorAll('.target-lang-dropdown-content a');
+
+    sourcelanguageLinks.forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            var source_language = event.target.textContent;
+            document.querySelector('.div-8').textContent = source_language;
+            document.querySelector('.source-lang-dropdown-content').style.display = 'none';
+        });
+    });
+
+    targetlanguageLinks.forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            var target_language = event.target.textContent;
+            document.querySelector('.div-36').textContent = target_language;
+            document.querySelector('.target-lang-dropdown-content').style.display = 'none';
+        });
+    });
+
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            document.getElementById('uploadStatus').innerText = 'File uploaded successfully!';
+            document.getElementById('uploadStatus').style.display = 'block';
+        }
+    });
+
+    document.getElementById('translateButton').addEventListener('click', async function() {
+        const sourceLangText = document.querySelector('.div-8').textContent;
+        const targetLangText = document.querySelector('.div-36').textContent;
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const downloadLinkContainer = document.getElementById('downloadLink');
+        const downloadLink = downloadLinkContainer.querySelector('a');
+
+
+        var prompt = document.getElementById('textInput').value;
+
+        if (file) {
+            // console.log("file selected");
+            if (sourceLangText !== "Please select a source language" && targetLangText !== "Please select a target language" && sourceLangText !== targetLangText) {
+                console.log('target lang and source lang seleceted' + sourceLangText + targetLangText);
+
+                if (prompt === "") {
+                  prompt = "Translate from " + sourceLangText + " to " +  targetLangText + ".";
+                }
+                // console.log(prompt);
+
+                // document.getElementById('translateButton').innerText = 'Uploading file... The download link will appear after successful translation.';
+
+                document.getElementById('translateButton').style.display = 'none';
+                document.getElementById('uploadStatus').style.cursor = 'none';
+                document.getElementById('body-acc-container').style.display='block';
+
+               
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('source_language', sourceLangText);
+                formData.append('target_language', targetLangText);
+                formData.append('custom_prompt', prompt);
+
+                
+
+                try {
+                    const response = await fetch('/', {
+                        method: 'POST',
+                        body: formData 
+                    });
+                    // console.log(response);
+    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.translated_file_url) {
+                            downloadLink.href = result.translated_file_url;
+                            downloadLink.download = 'translated_document.' + file.name.split('.').pop(); // To keep the original extension
+                            downloadLinkContainer.style.display = 'block'; 
+                            document.getElementById('uploadStatus').innerText = 'File successfully translated. Ready for download.';
+                        } else {
+                            document.getElementById('uploadStatus').innerText = 'Translation received but no file to download.';
+                        }
+                    } else {
+                        document.getElementById('uploadStatus').innerText = 'File translation failed. Please try again.';
+                    }
+                } catch (error) {
+                    document.getElementById('uploadStatus').innerText = `Error: ${error}`;
+                }
+
+            } else {
+                alert("Please select both a source and a target language or Select different source and target languages!");
+            }
+        } else {
+            alert("Please input a file!");
+        }
+    });
+
+    socket.on('progress_update', function(data) {
+        updateProgressBar(data.progress);
+    });
+
+    function updateProgressBar(percentage) {
+        const progressBar = document.getElementById('fileProgress');
+        const progressText = document.getElementById('progressText');
+        progressBar.value = percentage;
+        progressText.innerText = percentage.toFixed(0) + '%';
+    }
+
+  </script>
+</html>
