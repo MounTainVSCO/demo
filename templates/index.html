@@ -214,12 +214,8 @@
                 console.log('target lang and source lang seleceted' + sourceLangText + targetLangText);
 
                 if (prompt === "") {
-                  prompt = "Translate from " + sourceLangText + " to " +  targetLangText + ".";
+                  prompt = "Ignore text not in " + source_language + ". Translate from " + source_language + " to " + target_language + ", ensuring academic quality, correct punctuation, and complete sentences.";
                 }
-                // console.log(prompt);
-
-                // document.getElementById('translateButton').innerText = 'Uploading file... The download link will appear after successful translation.';
-
                 document.getElementById('translateButton').style.display = 'none';
                 document.getElementById('uploadStatus').style.cursor = 'none';
                 document.getElementById('body-acc-container').style.display='block';

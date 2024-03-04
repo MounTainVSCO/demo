@@ -14,6 +14,12 @@ def home():
 @app.route('/', methods=['POST'])
 def translate_document():
     print(request.form['custom_prompt'])
+    print(request.form['source_language'])
+    print(request.form['target_language'])
+    print(request.form['custom_prompt'])
+
+    source_language = request.form["source_language"]
+    target_language = request.form["target_language"]
 
     temp_directory = os.path.join(app.root_path, 'temp')
     os.makedirs(temp_directory, exist_ok=True)
@@ -24,10 +30,17 @@ def translate_document():
         temp_path = os.path.join(temp_directory, filename)
         uploaded_file.save(temp_path)
 
-        paragraphs = translationengine.split_into_paragraphs(temp_path)
-        output_file_name = f"translated_{filename}"
+
+        output_file_name = f"{source_language}_to_{target_language}_{filename}"
         output_file_path = os.path.join(temp_directory, output_file_name)
 
+        # Start entity mapping process
+        
+        entire_text = translationengine.get_docx_text(temp_path)
+        entity_mapping_dictionary = translationengine.identify_entities(entire_text, request.form['source_language'], request.form['target_language'])
+        mapped_text_with_entites = translationengine.replace_entities(entity_mapping_dictionary)
+        text_without_footnote = translationengine.remove_footnote_markers(mapped_text_with_entites)
+        paragraphs = translationengine.split_into_paragraphs(text_without_footnote)
         translationengine.create_translated_document(paragraphs, translationengine.client, output_file_path, socketio, request.form['custom_prompt'])
 
         
@@ -41,5 +54,5 @@ def translate_document():
         return {'error': 'No file uploaded.'}
 
 if __name__ == '__main__':
-    ner_models = {}
+    
     socketio.run(app, debug=False)

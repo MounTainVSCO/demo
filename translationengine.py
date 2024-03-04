@@ -4,43 +4,36 @@ import openai
 from openai import OpenAI
 from docx import Document
 from dotenv import load_dotenv
-import os, fitz
+import os, fitz, spacy
 from flask_socketio import SocketIO
 
+ner_models = {}
 load_dotenv('config.env')
 API_KEY = os.getenv('API_KEY')
 client = OpenAI(api_key=API_KEY)
 
-def split_into_paragraphs(file_path):
-    doc = Document(file_path)
-    return [(paragraph.text, paragraph.style) for paragraph in doc.paragraphs if paragraph.text.strip() != '']
+def split_into_paragraphs(text):
+    return [paragraph for paragraph in text.split('\n') if paragraph.strip() != '']
 
 def split_into_sentences(paragraph):
     return paragraph.split('. ')
 
+def get_docx_text(file_path):
+    doc = Document(file_path)
+    whole_text = ""
+    for paragraph in doc.paragraphs:
+        whole_text += paragraph.text + "\n"
+    return whole_text
 def get_pdf_paragraphs(file_path):
-    # Open the PDF file
     doc = fitz.open(file_path)
     text = ""
     for page in doc:
-        # Extract text from the page
         page_text = page.get_text("text")
         paragraphs = page_text.split('\n')
         for paragraph in paragraphs:
             text += paragraph + "\n"
     doc.close()
     return text
-
-def identify_entities(text, source_language, target_language):
-    nlp = ner_models[source_language]
-    doc = nlp(text)
-    entities = {}
-
-    for ent in doc.ents:
-        if ent.text not in entities and ent.label_ in ['PERSON', 'GPE', 'LOC', 'ORG', 'FAC', 'EVENT', 'NORP', 'WORK_OF_ART', 'PRODUCT']:
-            full_sentence = ent.sent.text
-            entities[ent.text] = ner_translate(ent.text, full_sentence, source_language=source_language, target_language=target_language, client=client)
-    return entities
 
 def remove_footnote_markers(text):
     pattern = r'\[\d+\]|\d+\s?|\(\d+\)' 
@@ -76,8 +69,6 @@ def create_translated_document(paragraphs, client, output_file_path, socketio, c
             translated_sentence = translate_text(context_sentences,  client, custom_prompt)
             translated_paragraph.append(translated_sentence.split('\n')[-1]) 
         
-        # print(paragraph)
-        
         progress = (index + 1) / len(paragraphs) * 100 
         socketio.emit('progress_update', {'progress': progress})
         p = translated_doc.add_paragraph(' '.join(translated_paragraph))
@@ -85,18 +76,47 @@ def create_translated_document(paragraphs, client, output_file_path, socketio, c
 
     translated_doc.save(output_file_path)
 
-def translate_given_text(text, source_language, target_language, client):
-    context_messages = [{"role": "system", "content": f"Translate from {source_language} to {target_language}"}, 
-                        {"role": "user", "content": text}]
+def ner_translate(entity, context_window, source_language, target_language, client):
+    print(f"translating {entity}")
+    context_messages = [{"role": "system", "content": f"If you cannot translate {entity}, DO NOT leave comments. Translate this text '{entity}' from {source_language} to {target_language} academically, given this context: '{context_window}' translate this text '{entity}'."}]
 
-    try:
-        response = client.chat.completions.create(model="gpt-4",
-                                                messages=context_messages,
-                                                temperature=0,
-                                                max_tokens=100)
-        return response.choices[0].message.content.strip()
+    while True:
+        try:
+            response = client.chat.completions.create(model="gpt-4",
+                                                      messages=context_messages,
+                                                      temperature=0.4,
+                                                      max_tokens=6969)
+            return response.choices[0].message.content.strip()
 
-    except openai.RateLimitError:
-        time.sleep(65)
-    except openai.OpenAIError as e:
-        raise e
+        except openai.RateLimitError:
+            time.sleep(65)
+        except openai.OpenAIError as e:
+            raise e
+
+def identify_entities(text, source_language, target_language):
+
+    if source_language == "en":
+        ner_models['en'] = spacy.load('en' + '_core_web_sm')
+    if (source_language == "zh-cn"):
+        source_language = "zh"
+        ner_models[source_language] = spacy.load(f'{source_language}_core_web_sm')
+    if (source_language == "ru"):
+        ner_models[source_language] = spacy.load(f'{source_language}_core_web_sm')
+        
+    nlp = ner_models[source_language]
+    doc = nlp(text)
+    entities = {}
+
+    for ent in doc.ents:
+        if ent.text not in entities and ent.label_ in ['PERSON', 'GPE', 'LOC', 'ORG', 'FAC', 'EVENT', 'NORP', 'WORK_OF_ART', 'PRODUCT']:
+            full_sentence = ent.sent.text
+            entities[ent.text] = ner_translate(ent.text, full_sentence, source_language=source_language, target_language=target_language, client=client)
+            print(entities[ent.text])
+    return entities
+
+def replace_entities(text, mapping):
+    regex_pattern = '|'.join(re.escape(key) for key in mapping.keys())
+    def replace_match(match):
+        return mapping[match.group(0)]
+    modified_text = re.sub(regex_pattern, replace_match, text)
+    return modified_text
